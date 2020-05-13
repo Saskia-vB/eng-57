@@ -82,3 +82,36 @@ VALUES
 SP_HELP employee_info
 
 SELECT * FROM employee_info
+SELECT * FROM Customers c
+WHERE c.Region LIKE '_A'
+
+SELECT COUNT(*) FROM Customers c
+WHERE c.Region='WA' or c.Region='SP'
+
+SELECT * FROM EmployeeTerritories emp WHERE emp.TerritoryID BETWEEN 06800 AND 09999
+
+SELECT * FROM Products
+
+SELECT p.ProductID, p.ProductName FROM Products p
+WHERE p.UnitPrice < 5.00
+
+SELECT * FROM Categories
+WHERE CategoryName LIKE '[BS]%'
+
+
+SELECT * FROM Orders
+
+SELECT o.EmployeeID, COUNT(*) AS "NumberofOrders"
+FROM Orders o
+GROUP BY EmployeeID
+HAVING EmployeeID IN (5,7)
+
+
+SELECT c.Region, c.CompanyName AS "Company Name", c.City + ',' + c.Country "City"
+FROM Customers c WHERE c.Region IS NOT NULL
+
+SELECT e.FirstName + ' ' + e.LastName AS "Employee Name" FROM Employees e
+
+SELECT * FROM Customers
+
+SELECT DISTINCT c.Country FROM Customers c WHERE c.Region IS NOT NULL
