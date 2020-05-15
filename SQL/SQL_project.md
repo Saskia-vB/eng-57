@@ -14,8 +14,6 @@ Exercise 1 – Northwind Queries (40 marks: 5 for each question)
 
 1.1	Write a query that lists all Customers in either Paris or London. Include Customer ID, Company Name and all address fields.
 
--	Doesn’t actually mention to select city
-
 ```SQL
 SELECT c.CustomerID, c.CompanyName, c.Address, c.City
 FROM Customers c
