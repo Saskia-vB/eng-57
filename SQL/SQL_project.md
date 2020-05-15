@@ -22,15 +22,12 @@ FROM Customers c
 WHERE c.City='London' OR c.City='Paris'
 ```
 1.2	List all products stored in bottles.
--	Doesn’t mention to select ID or name
-
 ```SQL
 SELECT p.ProductID, p.ProductName, p.QuantityPerUnit
 FROM Products p
 WHERE p.QuantityPerUnit LIKE '%bottle%'
 ```
 1.3	Repeat question above, but add in the Supplier Name and Country.
--	Supplier name = Company name or contact name
 
 ```SQL
 SELECT p.ProductID, p.QuantityPerUnit, p.SupplierID, s.CompanyName AS 'Supplier Name', s.Country
@@ -60,9 +57,16 @@ WHERE e.Country='UK'
 ```
 
 1.6	List Sales Totals for all Sales Regions (via the Territories table using 4 joins) with a Sales Total greater than 1,000,000. Use rounding or FORMAT to present the numbers.
-
-Orders employee territories territories region
-Sum regions – will sum up the rest
+```SQL
+SELECT r.RegionDescription, FORMAT(SUM(od.UnitPrice*(1-od.Discount)*od.Quantity), 'C') AS "Total Sales"
+FROM Orders o
+INNER JOIN [Order Details] od ON o.OrderID=od.OrderID
+INNER JOIN EmployeeTerritories et ON o.EmployeeID=et.EmployeeID
+INNER JOIN Territories t ON et.TerritoryID=t.TerritoryID
+INNER JOIN Region r ON t.RegionID=r.RegionID
+GROUP BY r.RegionDescription
+HAVING (SUM(od.UnitPrice*(1-od.Discount)*od.Quantity)) > 1000000
+```
 
 1.7	Count how many Orders have a Freight amount greater than 100.00 and either USA or UK as Ship Country.
 ```SQL
@@ -75,8 +79,10 @@ RESULT= 131
 ```
 1.8	Write an SQL Statement to identify the Order Number of the Order with the highest amount of discount applied to that order.
 ```SQL
-
-- SELECT TOP 1 o.OrderID, SUM(o.UnitPrice * o.Quantity * (1- o.Discount)) AS "Highest Discount Applied"
+SELECT TOP 1 od.OrderID, SUM(od.UnitPrice * od.Quantity * (1- od.Discount)) AS "Highest Discount Applied"
+FROM [Order Details] od
+GROUP BY od.OrderID
+ORDER BY "Highest Discount Applied"
 ```
 
 Exercise 2 – Create Spartans Table (20 marks – 10 each)
@@ -121,14 +127,36 @@ FROM Employees e
 ```
 
 3.2 List all Suppliers with total sales over $10,000 in the Order Details table. Include the Company Name from the Suppliers Table and present as a bar chart as below: (5 Marks)
-
-No matching records between suppliers and orders
-
+```SQL
+SELECT s.CompanyName, FORMAT(SUM(od.UnitPrice*(1-od.Discount)*od.Quantity), 'C') AS "Total Sales"
+FROM [Order Details] od
+INNER JOIN Products p ON od.ProductID=p.ProductID
+INNER JOIN Suppliers s ON p.SupplierID=s.SupplierID
+GROUP BY s.CompanyName
+HAVING (SUM(od.UnitPrice*(1-od.Discount)*od.Quantity))> 10000
+```
  
 
 3.3 List the Top 10 Customers YTD for the latest year in the Orders file. Based on total value of orders shipped. No Excel required. (10 Marks)
-3.4 Plot the Average Ship Time by month for all data in the Orders Table using a line chart as below. (10 Marks)
 
+```SQL
+SELECT TOP 10 SUM(od.UnitPrice*(1-od.Discount)*od.Quantity) AS "Total value of orders", 
+o.CustomerID
+FROM [Order Details] od
+INNER JOIN Orders o ON od.OrderID=o.OrderID
+WHERE o.ShippedDate BETWEEN '1998-01-01' AND '1998-05-06'
+GROUP BY o.CustomerID
+ORDER BY "Total value of orders" DESC
+```
+
+3.4 Plot the Average Ship Time by month for all data in the Orders Table using a line chart as below. (10 Marks)
+```SQL
+SELECT FORMAT(o.ShippedDate,'MM') AS "Month Shipped",
+AVG(DATEDIFF(d,o.OrderDate,o.ShippedDate)) AS "Average Ship Time"
+FROM Orders o
+GROUP BY FORMAT(o.ShippedDate, 'MM') 
+ORDER BY FORMAT(o.ShippedDate, 'MM')
+```
 
 Standards (10 marks)
 Remember to apply all the following standards:
